@@ -1,0 +1,14 @@
+rl:
+  encoder_vocab_size: 1344
+  encoder_embedding_dim : 16
+  encoder_hidden_dim: 32
+  deeper_embedding_dim: 16
+  deeper_hidden_dim: 16
+  lr: 0.02
+
+manager:
+  episode: 10
+  iterations: 2
+  batch: 4
+  epoch: 2
+  path: models/
