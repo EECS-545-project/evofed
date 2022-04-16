@@ -112,24 +112,16 @@ class Executor(job_api_pb2_grpc.JobServiceServicer):
     def init_data(self):
         """Return the training and testing dataset"""
         train_dataset, test_dataset = init_dataset()
-        if self.task == "rl":
-            return train_dataset, test_dataset
         # load data partitioner (entire_train_data)
         logging.info("Data partitioner starts ...")
 
         training_sets = DataPartitioner(data=train_dataset, args = self.args, numOfClass=self.args.num_class)
-        training_sets.partition_data_helper(num_clients=self.args.total_worker, data_map_file=self.args.data_map_file)
+        training_sets.partition_data_helper(num_clients=self.args.total_worker, num_part_label=self.args.num_part_label)
 
         testing_sets = DataPartitioner(data=test_dataset, args = self.args, numOfClass=self.args.num_class, isTest=True)
         testing_sets.partition_data_helper(num_clients=self.num_executors)
 
         logging.info("Data partitioner completes ...")
-
-
-        if self.task == 'nlp':
-            self.collate_fn = collate
-        elif self.task == 'voice':
-            self.collate_fn = voice_collate_fn
 
         return training_sets, testing_sets
 

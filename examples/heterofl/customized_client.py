@@ -1,8 +1,10 @@
+from cProfile import label
 import config
 import sys, os
+from fedscale.core import client
 from resnet_heterofl import resnet18
 from customized_fllibs import split_model
-sys.path.insert(1, os.path.join(sys.path[0], '../../'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../fedscale/core'))
 from client import Client
 from fllibs import Variable, os, math, torch, logging, np
  
@@ -26,8 +28,18 @@ class Customized_Client(Client):
                     break
         return
 
+    def check_label_num(self, target):
+        label_dict = {}
+        for t in target:
+            if t in label_dict.keys():
+                label_dict[t] += 1
+            else:
+                label_dict[t] == 0
+        return len(label_dict.keys())
+
 
     def train(self, client_data, model, conf):
+        assert(self.check_label_num(client_data) != 2)
         self.clientId = conf.clientId
         self.make_model_rate()
         logging.info(f"Start to split model (CLIENT: {self.clientId}, MODEL RATE: {self.model_rate}) ...")
@@ -51,6 +63,8 @@ class Customized_Client(Client):
                 if len(client_data) == 0:
                     logging.info(f"Error : data size = 0")
                     break
+                else:
+                    logging.info(f"Client {self.clientId}: data size = {len(client_data)}")
                 for data_pair in client_data:
                     (data, target) = data_pair
                     data = Variable(data).to(device=device)
@@ -70,7 +84,7 @@ class Customized_Client(Client):
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(self.local_model.parameters(), 1)
                     optimizer.step()
-                logging.info(f"Client {self.clientId} complets local epoch: {completed_steps}, loss square: {loss_squre}")
+                logging.info(f"Client {self.clientId} completes local epoch: {completed_steps}, loss square: {loss_squre}")
                 completed_steps += 1
 
             except Exception as ex:

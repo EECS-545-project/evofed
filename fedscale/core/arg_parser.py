@@ -174,6 +174,9 @@ parser.add_argument('--noise-max', default=0.5,
 parser.add_argument('--no-bidirectional', dest='bidirectional', action='store_false', default=True,
                     help='Turn off bi-directional RNNs, introduces lookahead convolution')
 
+# for cifar non-iid
+parser.add_argument('--num_part_label', default=2, help='Number of class in each clients')
+
 args, unknown = parser.parse_known_args()
 args.use_cuda = eval(args.use_cuda)
 

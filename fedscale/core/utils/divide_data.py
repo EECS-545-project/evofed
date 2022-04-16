@@ -88,13 +88,12 @@ class DataPartitioner(object):
             self.partitions[clientId_maps[idx]].append(idx)
 
 
-    def partition_data_helper(self, num_clients, data_map_file=None):
+    def partition_data_helper(self, num_clients, num_part_label=-1):
 
         # read mapping file to partition trace
-        if data_map_file is not None:
-            self.trace_partition(data_map_file)
-        else:
+        if num_part_label == -1:
             self.uniform_partition(num_clients=num_clients)
+        self.balanced_skew_label_partition(num_clients, num_part_labels=num_part_label)
 
     def uniform_partition(self, num_clients):
         # random partition
@@ -109,6 +108,19 @@ class DataPartitioner(object):
             part_len = int(1./num_clients * data_len)
             self.partitions.append(indexes[0:part_len])
             indexes = indexes[part_len:]
+    
+    def balanced_skew_label_partition(self, num_clients, num_part_labels):
+        for _ in range(num_clients):
+            part_label_len = int(1. / num_clients / num_part_labels * self.getDataLen())
+            local_label_idx = self.rng.choices(list(range(self.numOfLabels)), k=num_part_labels)
+            selected_label_idx = []
+            for label in local_label_idx:
+                l = [i for i in range(self.numOfLabels) if self.labels[i] == label]
+                self.rng.shuffle(l)
+                l = l[0:part_label_len]
+                selected_label_idx += l
+            self.partitions.append(selected_label_idx)
+    
 
     def use(self, partition, istest):
         resultIndex = self.partitions[partition]
