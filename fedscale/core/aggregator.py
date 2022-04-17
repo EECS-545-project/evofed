@@ -5,7 +5,9 @@ from random import Random
 from fedscale.core.resource_manager import ResourceManager
 from fedscale.core.communication.channel_context import ExecutorConnections
 from fedscale.core.response import BasicResponse
-
+from performance_predictor.predictor import predict
+from architecture_optimizer.optimizer import optimize
+from architecture_optimizer.util.init_model import OptResnet18
 import fedscale.core.job_api_pb2_grpc as job_api_pb2_grpc
 import fedscale.core.job_api_pb2 as job_api_pb2
 import grpc
@@ -74,6 +76,8 @@ class Aggregator(object):
 
         # ======== Task specific ============
         self.imdb = None           # object detection
+        self.test_log = []         # for performance predictor
+        self.opt_times = 0         # for architecture optimizer
 
 
     def setup_env(self):
@@ -215,7 +219,7 @@ class Aggregator(object):
 
     def run(self):
         self.setup_env()
-        self.model = self.init_model()
+        self.model = OptResnet18()
         self.save_last_param()
 
         self.model_update_size = sys.getsizeof(pickle.dumps(self.model))/1024.0*8. # kbits
@@ -336,6 +340,16 @@ class Aggregator(object):
         self.stats_util_accumulator = []
         self.client_training_results = []
 
+        if len(self.test_log) > 50:
+            if (predict(self.test_log, self.args.epoch < self.epoch) < 0.8):
+                if self.opt_times < 3:
+                    self.model = optimize(self.model, self.opt_times)
+                    self.opt_model = self.model
+                    self.opt_times += 1
+        elif len(self.test_log) > 100 and self.opt_times < 3:
+            self.model = optimize(self.model, self.opt_times)
+            self.opt_model = self.model
+            self.opt_times += 1
         if self.epoch >= self.args.epochs:
             self.event_queue.append('stop')
         elif self.epoch % self.args.eval_interval == 0:
@@ -390,6 +404,8 @@ class Aggregator(object):
                     self.testing_history['perf'][self.epoch]['top_5'], self.testing_history['perf'][self.epoch]['loss'],
                     self.testing_history['perf'][self.epoch]['test_len']))
 
+            self.test_log.append(self.testing_history['perf'][self.epoch]['top_1'])
+
             # Dump the testing result
             with open(os.path.join(logDir, 'testing_perf'), 'wb') as fout:
                 pickle.dump(self.testing_history, fout)
@@ -409,7 +425,11 @@ class Aggregator(object):
         # learning rate scheduler
         conf = {}
         conf['learning_rate'] = self.args.learning_rate
-        conf['model'] = None
+        if self.opt_model != None:
+            conf['model'] = copy.deepcopy(self.opt_model)
+            self.opt_model = None
+        else:
+            conf['model'] = None
         return conf
 
     def create_client_task(self, executorId):

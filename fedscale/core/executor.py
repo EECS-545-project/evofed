@@ -14,8 +14,10 @@ import io
 import torch
 import pickle
 
+from architecture_optimizer.util.init_model import OptResnet18
 
-MAX_MESSAGE_LENGTH = 50000000
+
+MAX_MESSAGE_LENGTH = 500000000
 
 
 class Executor(job_api_pb2_grpc.JobServiceServicer):
@@ -128,7 +130,7 @@ class Executor(job_api_pb2_grpc.JobServiceServicer):
 
     def run(self):
         self.setup_env()
-        self.model = self.init_model()
+        self.model = OptResnet18()
         self.model = self.model.to(device=self.device)
         self.training_sets, self.testing_sets = self.init_data()
         self.setup_communication()

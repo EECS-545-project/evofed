@@ -36,10 +36,12 @@ class RL_Agent():
         if is_training:
             self.optimizer.zero_grad()
             self.policy.train(True)
+            deeper_decision, deeper_probs, wider_decision, wider_probs \
+                = self.policy(input, num_layers, is_training, self.deeper_decision_trajectory[iteration])
         else:
             self.policy.train(False)
-        deeper_decision, deeper_probs, wider_decision, wider_probs \
-            = self.policy(input, num_layers, is_training, self.deeper_decision_trajectory[iteration])
+            deeper_decision, deeper_probs, wider_decision, wider_probs \
+                = self.policy(input, num_layers, is_training)
         if is_training:
             self.wider_decision_trajectory.append(wider_decision)
             self.deeper_decision_trajectory.append(deeper_decision)
@@ -79,3 +81,6 @@ class RL_Agent():
         for time in timestamp:
             timestamp_str += str(time) + '_'
         torch.save(self.policy, self.conf["path"] + 'policy' + timestamp_str + '.pt')
+
+    def load_policy(self, opt_times: int):
+        self.policy = torch.load("models/policy" + str(opt_times+1) + ".pt")

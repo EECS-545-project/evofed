@@ -158,21 +158,22 @@ class Archi_Manager():
         else:
             return self.model
 
-    def optimize_model(self):
-        self.init_agent()
-        for e in range(self.conf["episode"]):
-            self.agent.init_trajectory()
-            self.reload_training_model()
-            for i in range(self.conf["iterations"]):
-                print('#'*10 + f" training optimization policy [{e}, {i}] " + '#'*10)
-                seq = self.nn2seq(True)
-                num_layers = seq.shape[1]
-                wider_decision, deeper_decision = self.agent.sample_decision(seq, num_layers, True, i)
-                self.apply_decision(wider_decision, deeper_decision, True)
-                self.train_model(self.conf["epoch"], True)
-                self.agent.load_reward(self.test_model(True))
-            self.agent.update_parameter()
-        self.agent.save_policy()
+    def optimize_model(self, need_training: bool=False):
+        if need_training:
+            self.init_agent()
+            for e in range(self.conf["episode"]):
+                self.agent.init_trajectory()
+                self.reload_training_model()
+                for i in range(self.conf["iterations"]):
+                    print('#'*10 + f" training optimization policy [{e}, {i}] " + '#'*10)
+                    seq = self.nn2seq(True)
+                    num_layers = seq.shape[1]
+                    wider_decision, deeper_decision = self.agent.sample_decision(seq, num_layers, True, i)
+                    self.apply_decision(wider_decision, deeper_decision, True)
+                    self.train_model(self.conf["epoch"], True)
+                    self.agent.load_reward(self.test_model(True))
+                self.agent.update_parameter()
+            self.agent.save_policy()
         with torch.no_grad():
             print('#'*10 + f" optimizing model " + '#'*10)
             for i in range(self.conf["iterations"]):
@@ -210,3 +211,6 @@ class Archi_Manager():
         for time in timestamp:
             timestamp_str += str(time) + '_'
         torch.save(self.model, self.conf["path"] + 'resnet' + timestamp_str + '.pt')
+
+    def load_policy(self, opt_times):
+        self.agent.load_policy(opt_times)
