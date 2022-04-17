@@ -28,18 +28,20 @@ class Customized_Client(Client):
                     break
         return
 
-    def check_label_num(self, target):
+    def check_label_num(self, data):
         label_dict = {}
-        for t in target:
-            if t in label_dict.keys():
-                label_dict[t] += 1
-            else:
-                label_dict[t] == 0
+        for data_pair in data:
+            _, target = data_pair
+            for t in target.tolist():
+                if t in label_dict.keys():
+                    label_dict[t] += 1
+                else:
+                    label_dict[t] = 0
         return len(label_dict.keys())
 
 
     def train(self, client_data, model, conf):
-        assert(self.check_label_num(client_data) != 2)
+        assert(self.check_label_num(client_data) == 2)
         self.clientId = conf.clientId
         self.make_model_rate()
         logging.info(f"Start to split model (CLIENT: {self.clientId}, MODEL RATE: {self.model_rate}) ...")
