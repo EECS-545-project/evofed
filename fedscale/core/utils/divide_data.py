@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cProfile import label
 from random import Random
 from torch.utils.data import DataLoader
 import numpy as np
@@ -121,7 +122,20 @@ class DataPartitioner(object):
                 l = l[0:part_label_len]
                 selected_label_idx += l
             self.partitions.append(selected_label_idx)
-    
+
+    def unbalanced_whole_label_partition(self, num_clients):
+        for _ in num_clients:
+            part_label_len = int(1. / num_clients * self.getDataLen())
+            label_prop = self.rng.choices(list(range(10)), k=self.numOfLabels)
+            label_prop_normed = [label_p / sum(label_prop) for label_p in label_prop]
+            label_num = [part_label_len * label_p_n for label_p_n in label_prop_normed]
+            selected_label_idx = []
+            for i in range(self.numOfLabels):
+                l = [i for i in range(len(self.labels)) if self.labels[i] == label]
+                self.rng.shuffle(l)
+                l = l[0:label_num[i]]
+                selected_label_idx += l
+            self.partitions.append(selected_label_idx)
 
     def use(self, partition, istest):
         resultIndex = self.partitions[partition]
