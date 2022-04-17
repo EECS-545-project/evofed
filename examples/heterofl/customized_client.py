@@ -37,6 +37,7 @@ class Customized_Client(Client):
                     label_dict[t] += 1
                 else:
                     label_dict[t] = 0
+        logging.info(f"{label_dict.keys()}")
         return len(label_dict.keys())
 
 
