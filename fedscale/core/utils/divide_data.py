@@ -93,6 +93,7 @@ class DataPartitioner(object):
         # read mapping file to partition trace
         if num_part_label == -1:
             self.uniform_partition(num_clients=num_clients)
+            return
         self.balanced_skew_label_partition(num_clients, num_part_labels=num_part_label)
 
     def uniform_partition(self, num_clients):
@@ -112,10 +113,10 @@ class DataPartitioner(object):
     def balanced_skew_label_partition(self, num_clients, num_part_labels):
         for _ in range(num_clients):
             part_label_len = int(1. / num_clients / num_part_labels * self.getDataLen())
-            local_label_idx = self.rng.choices(list(range(self.numOfLabels)), k=num_part_labels)
+            local_label_idx = self.rng.sample(list(range(self.numOfLabels)), k=num_part_labels)
             selected_label_idx = []
             for label in local_label_idx:
-                l = [i for i in range(self.numOfLabels) if self.labels[i] == label]
+                l = [i for i in range(len(self.labels)) if self.labels[i] == label]
                 self.rng.shuffle(l)
                 l = l[0:part_label_len]
                 selected_label_idx += l
