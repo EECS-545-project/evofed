@@ -89,13 +89,17 @@ class DataPartitioner(object):
             self.partitions[clientId_maps[idx]].append(idx)
 
 
-    def partition_data_helper(self, num_clients, num_part_label=-1):
+    def partition_data_helper(self, num_clients, iid: bool=True, balanced: bool = False, num_part_label: int = -1):
 
-        # read mapping file to partition trace
-        if num_part_label == -1:
+        # partition data according to modes
+        if iid:
             self.uniform_partition(num_clients=num_clients)
-            return
-        self.balanced_skew_label_partition(num_clients, num_part_labels=num_part_label)
+        elif not balanced:
+            self.unbalanced_whole_label_partition()(num_clients)
+        elif num_part_label != -1:
+            self.balanced_skew_label_partition(num_clients, num_part_label)
+        else:
+            self.uniform_partition(num_clients)
 
     def uniform_partition(self, num_clients):
         # random partition

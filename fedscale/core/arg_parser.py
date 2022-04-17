@@ -176,6 +176,8 @@ parser.add_argument('--no-bidirectional', dest='bidirectional', action='store_fa
 
 # for cifar non-iid
 parser.add_argument('--num_part_label', default=2, help='Number of class in each clients')
+parser.add_argument('--iid', default=True, help='identical and independent distribution')
+parser.add_argument('--balanced', default=True, help='for non-iid data, if the number of data for each label is the same')
 
 args, unknown = parser.parse_known_args()
 args.use_cuda = eval(args.use_cuda)
