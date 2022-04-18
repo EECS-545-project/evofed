@@ -17,7 +17,7 @@ import pickle
 from architecture_optimizer.util.init_model import OptResnet18
 
 
-MAX_MESSAGE_LENGTH = 500000000
+MAX_MESSAGE_LENGTH = 80000000
 
 
 class Executor(job_api_pb2_grpc.JobServiceServicer):

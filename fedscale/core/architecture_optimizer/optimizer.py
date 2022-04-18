@@ -1,11 +1,10 @@
-from math import fabs
-from multiprocessing import managers
-from Archi_Manager import Archi_Manager
+from architecture_optimizer.Archi_Manager import Archi_Manager
 import yaml
+import sys
 
 def optimize(model, opt_times: int):
     conf = None
-    with open('config.yml', 'r') as yf:
+    with open(sys.path[0]+'/architecture_optimizer/config.yml', 'r') as yf:
         conf = yaml.safe_load(yf)
     manager = Archi_Manager(conf)
     manager.init_agent()

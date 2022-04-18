@@ -5,7 +5,7 @@ import fedscale.core.job_api_pb2 as job_api_pb2
 
 class ExecutorConnections(object):
     """"Helps aggregator manage its grpc connection with executors."""
-    MAX_MESSAGE_LENGTH = 50000000
+    MAX_MESSAGE_LENGTH = 90000000
 
     class _ExecutorContext(object):
         def __init__(self, executorId):

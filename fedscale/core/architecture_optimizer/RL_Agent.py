@@ -1,7 +1,8 @@
 from datetime import datetime
+import sys
 import torch
 import torch.optim as optim
-from Policy_Network import Policy_Network, Wider_Actor
+from architecture_optimizer.Policy_Network import Policy_Network, Wider_Actor
 
 class RL_Agent():
     def __init__(self, conf, num_layers: int=16) -> None:
@@ -83,4 +84,8 @@ class RL_Agent():
         torch.save(self.policy, self.conf["path"] + 'policy' + timestamp_str + '.pt')
 
     def load_policy(self, opt_times: int):
-        self.policy = torch.load("models/policy" + str(opt_times+1) + ".pt")
+        tmp_sys_path = sys.path[0]
+        sys.path[0] = sys.path[0] + "/architecture_optimizer"
+        print(sys.path[0])
+        self.policy = torch.load("/users/yuxuanzh/evofed/fedscale/core/architecture_optimizer/models/policy" + str(opt_times+1) + ".pt")
+        sys.path[0] = tmp_sys_path

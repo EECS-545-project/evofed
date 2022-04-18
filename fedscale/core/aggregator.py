@@ -78,6 +78,7 @@ class Aggregator(object):
         self.imdb = None           # object detection
         self.test_log = []         # for performance predictor
         self.opt_times = 0         # for architecture optimizer
+        self.opt_model = None
 
 
     def setup_env(self):
@@ -340,13 +341,20 @@ class Aggregator(object):
         self.stats_util_accumulator = []
         self.client_training_results = []
 
+        logging.info(f"{self.test_log}")
         if len(self.test_log) > 50:
-            if (predict(self.test_log, self.args.epoch < self.epoch) < 0.8):
-                if self.opt_times < 3:
-                    self.model = optimize(self.model, self.opt_times)
-                    self.opt_model = self.model
-                    self.opt_times += 1
+            try:
+                if (predict(self.test_log, self.args.epochs - self.epoch) < 0.8):
+                    if self.opt_times < 3:
+                        self.test_log = []
+                        self.model = optimize(self.model, self.opt_times)
+                        self.opt_model = self.model
+                        self.opt_times += 1
+            except:
+                logging.info(f"Fail to predict")
+                pass
         elif len(self.test_log) > 100 and self.opt_times < 3:
+            self.test_log = []
             self.model = optimize(self.model, self.opt_times)
             self.opt_model = self.model
             self.opt_times += 1
@@ -404,7 +412,7 @@ class Aggregator(object):
                     self.testing_history['perf'][self.epoch]['top_5'], self.testing_history['perf'][self.epoch]['loss'],
                     self.testing_history['perf'][self.epoch]['test_len']))
 
-            self.test_log.append(self.testing_history['perf'][self.epoch]['top_1'])
+            self.test_log.append(self.testing_history['perf'][self.epoch]['top_1'] / 100)
 
             # Dump the testing result
             with open(os.path.join(logDir, 'testing_perf'), 'wb') as fout:

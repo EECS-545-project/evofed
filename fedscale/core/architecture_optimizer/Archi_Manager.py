@@ -1,9 +1,10 @@
 from unittest import TestLoader
 import torch
 import copy
-from RL_Agent import RL_Agent
-from util.train_model import train
-from util.test_model import test
+import sys
+from architecture_optimizer.RL_Agent import RL_Agent
+from architecture_optimizer.util.train_model import train
+from architecture_optimizer.util.test_model import test
 import torchvision
 import torchvision.transforms as transforms
 from datetime import datetime
@@ -210,7 +211,7 @@ class Archi_Manager():
         timestamp_str = str()
         for time in timestamp:
             timestamp_str += str(time) + '_'
-        torch.save(self.model, self.conf["path"] + 'resnet' + timestamp_str + '.pt')
+        torch.save(self.model, sys.path[0] + '/architecture_optimizer/' + self.conf["path"] + 'resnet' + timestamp_str + '.pt')
 
     def load_policy(self, opt_times):
         self.agent.load_policy(opt_times)

@@ -1,4 +1,4 @@
-from curve_model import curving_model
+from performance_predictor.curve_model import curving_model
 import numpy as np
 
 def predict(y_train: list, endingpoint: int) -> int:

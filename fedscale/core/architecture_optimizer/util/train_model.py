@@ -3,7 +3,7 @@ import torchvision
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
-from util.test_model import test
+from architecture_optimizer.util.test_model import test
 def train(model: torch.nn.Module, epoch: int, trainloader = None, testloader = None) -> torch.nn.Module:
     accu_log = []
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

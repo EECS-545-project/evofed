@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import curve_fit
-from curve_functions import pow3, pow4, log_power, weibull, mmf, janoschek, ilog2, exp3, exp4, dr_hill_zero_background
+from performance_predictor.curve_functions import pow3, pow4, log_power, weibull, mmf, janoschek, ilog2, exp3, exp4, dr_hill_zero_background
 
 
 
