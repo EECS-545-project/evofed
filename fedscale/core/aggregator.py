@@ -185,8 +185,6 @@ class Aggregator(object):
 
 
     def tictak_client_tasks(self, sampled_clients, num_clients_to_collect):
-        """We try to remove dummy events as much as possible, by removing the stragglers/offline clients in overcommitment"""
-
         sampledClientsReal = []
         completionTimes = []
         completed_client_clock = {}
@@ -205,17 +203,17 @@ class Aggregator(object):
                 completionTimes.append(roundDuration)
                 completed_client_clock[client_to_run] = exe_cost
 
-        num_clients_to_collect = min(num_clients_to_collect, len(completionTimes))
+        num_clients_to_collect = min(num_clients_to_collect // 10, len(completionTimes))
         # 2. get the top-k completions to remove stragglers
         sortedWorkersByCompletion = sorted(range(len(completionTimes)), key=lambda k:completionTimes[k])
-        top_k_index = sortedWorkersByCompletion[:num_clients_to_collect]
+        top_k_index = random.sample(sortedWorkersByCompletion, k=num_clients_to_collect)
         clients_to_run = [sampledClientsReal[k] for k in top_k_index]
 
         dummy_clients = [sampledClientsReal[k] for k in sortedWorkersByCompletion[num_clients_to_collect:]]
         round_duration = completionTimes[top_k_index[-1]]
         completionTimes.sort()
 
-        return clients_to_run, dummy_clients, completed_client_clock, round_duration, completionTimes[:num_clients_to_collect]
+        return clients_to_run, [], completed_client_clock, round_duration, completionTimes[:num_clients_to_collect]
 
 
     def run(self):
@@ -349,7 +347,7 @@ class Aggregator(object):
             except:
                 logging.warning(f"Fail to predict, this may be due to bad value in test_log:\n {self.test_log}")
             if pdt < 0.8 and pdt > 0:
-                logging.info(f"predicted accuracy in epoch {self.arg.epochs}: {pdt}")
+                logging.info(f"predicted accuracy in epoch {self.args.epochs}: {pdt}")
                 if self.opt_times < 3:
                     self.test_log = []
                     self.model = optimize(self.model, self.opt_times)
