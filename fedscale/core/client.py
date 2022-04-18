@@ -170,10 +170,10 @@ class Client(object):
                     # ========= Weight handler ========================
                     self.optimizer.update_client_weight(conf, model, global_model if global_model is not None else None  )
 
-                    completed_steps += 1
+                completed_steps += 1
 
-                    if completed_steps == conf.local_steps:
-                        break
+                    # if completed_steps == conf.local_steps:
+                    #     break
 
             except Exception as ex:
                 error_type = ex
