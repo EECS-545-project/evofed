@@ -1,6 +1,6 @@
 ## EvoFed based on FedScale
 
-This project is larged based on the code base of FedScale with adaptation to support NAS and multiple architectures in Horizontal Federated Learning
+This project is largely based on the code base of FedScale with adaptation to support NAS and multiple architectures in Horizontal Federated Learning
 
 ### To setup
 Please execute `source install.sh` at project root directory to install the dependencies.
