@@ -45,7 +45,7 @@ job_conf:
     - num_loaders: 2
     - local_steps: 20
     - learning_rate: 0.001
-    - batch_size: 10
+    - batch_size: 32
     - test_bsz: 32
     - use_cuda: False
     - iid: True
