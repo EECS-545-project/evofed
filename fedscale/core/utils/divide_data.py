@@ -91,8 +91,11 @@ class DataPartitioner(object):
 
     def partition_data_helper(self, num_clients, iid: bool=True, balanced: bool = False, num_part_label: int = -1):
         # partition data according to modes
+        if self.isTest is True:
+            logging.info(f"Random partition for testing")
+            self.uniform_partition(num_clients=num_clients)
+            return
         if self.args.iid is True:
-            assert(self.args.iid is True)
             logging.info(f"IID partition data")
             self.uniform_partition(num_clients=num_clients)
         elif self.args.balanced is False:
@@ -122,6 +125,7 @@ class DataPartitioner(object):
         for _ in range(num_clients):
             part_label_len = int(1. / num_clients / num_part_labels * self.getDataLen())
             local_label_idx = self.rng.sample(list(range(self.numOfLabels)), k=num_part_labels)
+            logging.info(f"{local_label_idx}")
             selected_label_idx = []
             for label in local_label_idx:
                 l = [i for i in range(len(self.labels)) if self.labels[i] == label]
