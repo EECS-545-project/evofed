@@ -343,21 +343,23 @@ class Aggregator(object):
 
         logging.info(f"{self.test_log}")
         if len(self.test_log) > 50:
+            pdt = -1.0
             try:
-                if (predict(self.test_log, self.args.epochs - self.epoch) < 0.8):
-                    if self.opt_times < 3:
-                        self.test_log = []
-                        self.model = optimize(self.model, self.opt_times)
-                        self.opt_model = self.model
-                        self.opt_times += 1
+                pdt = predict(self.test_log, self.args.epochs - self.epoch)
             except:
-                logging.info(f"Fail to predict")
-                pass
-        elif len(self.test_log) > 100 and self.opt_times < 3:
-            self.test_log = []
-            self.model = optimize(self.model, self.opt_times)
-            self.opt_model = self.model
-            self.opt_times += 1
+                logging.warning(f"Fail to predict, this may be due to bad value in test_log:\n {self.test_log}")
+            if pdt < 0.8 and pdt > 0:
+                logging.info(f"predicted accuracy in epoch {self.arg.epochs}: {pdt}")
+                if self.opt_times < 3:
+                    self.test_log = []
+                    self.model = optimize(self.model, self.opt_times)
+                    self.opt_model = self.model
+                    self.opt_times += 1
+            elif len(self.test_log) > 100 and self.opt_times < 3:
+                self.test_log = []
+                self.model = optimize(self.model, self.opt_times)
+                self.opt_model = self.model
+                self.opt_times += 1
         if self.epoch >= self.args.epochs:
             self.event_queue.append('stop')
         elif self.epoch % self.args.eval_interval == 0:

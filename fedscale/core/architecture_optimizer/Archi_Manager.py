@@ -1,3 +1,4 @@
+from fedscale.core.fllibs import logging
 from unittest import TestLoader
 import torch
 import copy
@@ -8,7 +9,7 @@ from architecture_optimizer.util.test_model import test
 import torchvision
 import torchvision.transforms as transforms
 from datetime import datetime
-
+ 
 class Archi_Manager():
     def __init__(self, conf) -> None:
         self.global_conf = conf
@@ -130,12 +131,12 @@ class Archi_Manager():
             if wider_decision.shape[0] != len(self.model_for_train):
                 raise ValueError(f"Training: wrong number of decisions: {wider_decision.shape[0]} vs {len(self.model_for_train)}")
             for b in range(wider_decision.shape[0]):
-                print(f"widen model {b}: #{wider_decision[b]}")
+                logging.info(f"widen model {b}: #{wider_decision[b]}")
                 for i in range(wider_decision.shape[1]):
                     if wider_decision[b,i] == 1:
                         self.model_for_train[b].widden(i)
             for b in range(deeper_decision.shape[0]):
-                print(f"deepen model {b}: layer_idx= {deeper_decision[b][0].item()}, filter_size= {self.fs_vocab[deeper_decision[b][1].item()]}, stride={deeper_decision[b][2].item()+1}")
+                logging.info(f"deepen model {b}: layer_idx= {deeper_decision[b][0].item()}, filter_size= {self.fs_vocab[deeper_decision[b][1].item()]}, stride={deeper_decision[b][2].item()+1}")
                 self.model_for_train[b].deepen(deeper_decision[b][0].item(),\
                                                self.fs_vocab[deeper_decision[b][1].item()],\
                                                deeper_decision[b][2].item()+1)
@@ -143,13 +144,13 @@ class Archi_Manager():
             if wider_decision.shape[0] != 1:
                 raise ValueError(f"wrong number of decisions: {wider_decision.shape[0]}")
             for i in range(wider_decision.shape[1]):
-                print(f"widen model: widen layer #{wider_decision[0]}")
                 if wider_decision[0,i] == 1:
                         self.model.widden(i)
             self.model.deepen(deeper_decision[0,0].item(),\
                               self.fs_vocab[deeper_decision[0,1].item()],\
                               deeper_decision[0,2].item()+1)
-            print(f"deepen model: layer idx={deeper_decision[0,0].item()}, filter size={self.fs_vocab[deeper_decision[0,1].item()]}, stride={deeper_decision[0,2].item()+1}")
+            logging.info(f"widen model: widen layer #{wider_decision[0]}")
+            logging.info(f"deepen model: layer idx={deeper_decision[0,0].item()}, filter size={self.fs_vocab[deeper_decision[0,1].item()]}, stride={deeper_decision[0,2].item()+1}")
  
     def get_model(self, idx: int, is_training: bool = False):
         if is_training:
@@ -166,7 +167,7 @@ class Archi_Manager():
                 self.agent.init_trajectory()
                 self.reload_training_model()
                 for i in range(self.conf["iterations"]):
-                    print('#'*10 + f" training optimization policy [{e}, {i}] " + '#'*10)
+                    logging.info('#'*10 + f" training optimization policy [{e}, {i}] " + '#'*10)
                     seq = self.nn2seq(True)
                     num_layers = seq.shape[1]
                     wider_decision, deeper_decision = self.agent.sample_decision(seq, num_layers, True, i)
@@ -176,7 +177,7 @@ class Archi_Manager():
                 self.agent.update_parameter()
             self.agent.save_policy()
         with torch.no_grad():
-            print('#'*10 + f" optimizing model " + '#'*10)
+            logging.info('#'*10 + f" optimizing model " + '#'*10)
             for i in range(self.conf["iterations"]):
                 seq = self.nn2seq(False)
                 num_layers = seq.shape[1]

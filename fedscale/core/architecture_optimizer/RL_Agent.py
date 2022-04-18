@@ -2,7 +2,8 @@ from datetime import datetime
 import sys
 import torch
 import torch.optim as optim
-from architecture_optimizer.Policy_Network import Policy_Network, Wider_Actor
+from fedscale.core.fllibs import logging
+from architecture_optimizer.Policy_Network import Policy_Network
 
 class RL_Agent():
     def __init__(self, conf, num_layers: int=16) -> None:
@@ -51,7 +52,7 @@ class RL_Agent():
         return wider_decision, deeper_decision
 
     def update_parameter(self):
-        print(f"policy reward: {self.reward}")
+        logging.info(f"policy reward: {self.reward}")
         reward = torch.tensor(self.reward)
         loss = 0
         for i in range(self.batch):
@@ -71,7 +72,7 @@ class RL_Agent():
                 loss += -(deeper_entropy + wider_entropy) * ret / self.batch
         loss.backward(retain_graph=True)
         self.optimizer.step()
-        print(f"policy loss: {loss}")
+        logging.info(f"policy loss: {loss}")
 
     def load_reward(self, reward):
         self.reward.append(reward)
@@ -86,6 +87,5 @@ class RL_Agent():
     def load_policy(self, opt_times: int):
         tmp_sys_path = sys.path[0]
         sys.path[0] = sys.path[0] + "/architecture_optimizer"
-        print(sys.path[0])
         self.policy = torch.load("/users/yuxuanzh/evofed/fedscale/core/architecture_optimizer/models/policy" + str(opt_times+1) + ".pt")
         sys.path[0] = tmp_sys_path

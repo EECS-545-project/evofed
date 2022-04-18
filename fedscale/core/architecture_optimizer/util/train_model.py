@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from architecture_optimizer.util.test_model import test
+from fedscale.core.fllibs import logging
 def train(model: torch.nn.Module, epoch: int, trainloader = None, testloader = None) -> torch.nn.Module:
     accu_log = []
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -31,12 +32,12 @@ def train(model: torch.nn.Module, epoch: int, trainloader = None, testloader = N
             running_loss += loss.item()
             if i % 1000 == 999:
                 last_loss = running_loss / 1000
-                print(f"[{e+1}, {i+1:5d}] loss: {last_loss}")
+                logging.info(f"[{e+1}, {i+1:5d}] loss: {last_loss}")
                 running_loss = 0.0
         scheduler.step()
         if e % 5 == 4:
             accu = test(model, testloader=testloader)
-            print(f"training epoch {e}: test_accuracy = {accu}")
+            logging.info(f"training epoch {e}: test_accuracy = {accu}")
             accu_log.append(accu)
     print(f"finish training for {epoch} epochs")
     return model, accu_log
