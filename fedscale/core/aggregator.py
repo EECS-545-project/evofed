@@ -340,7 +340,7 @@ class Aggregator(object):
         self.client_training_results = []
 
         logging.info(f"{self.test_log}")
-        if len(self.test_log) > 50:
+        if len(self.test_log) > 300:
             pdt = -1.0
             try:
                 pdt = predict(self.test_log, self.args.epochs - self.epoch)
@@ -353,7 +353,7 @@ class Aggregator(object):
                     self.model = optimize(self.model, self.opt_times)
                     self.opt_model = self.model
                     self.opt_times += 1
-            elif len(self.test_log) > 50 and self.opt_times < 1:
+            elif len(self.test_log) > 300 and self.opt_times < 1:
                 self.test_log = []
                 self.model = optimize(self.model, self.opt_times)
                 self.opt_model = self.model
