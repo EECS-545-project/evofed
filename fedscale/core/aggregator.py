@@ -340,7 +340,7 @@ class Aggregator(object):
         self.client_training_results = []
 
         logging.info(f"{self.test_log}")
-        if len(self.test_log) > 50:
+        if len(self.test_log) > 500:
             pdt = -1.0
             try:
                 pdt = predict(self.test_log, self.args.epochs - self.epoch)
