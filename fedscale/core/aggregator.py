@@ -340,13 +340,13 @@ class Aggregator(object):
         self.client_training_results = []
 
         logging.info(f"{self.test_log}")
-        if len(self.test_log) > 500:
+        if len(self.test_log) > 300:
             pdt = -1.0
             try:
                 pdt = predict(self.test_log, self.args.epochs - self.epoch)
             except:
                 logging.warning(f"Fail to predict, this may be due to bad value in test_log:\n {self.test_log}")
-            if pdt < 0.8 and pdt > 0:
+            if pdt < 0.9 and pdt > 0:
                 logging.info(f"predicted accuracy in epoch {self.args.epochs}: {pdt}")
                 if self.opt_times < 3:
                     self.test_log = []
