@@ -44,7 +44,7 @@ job_conf:
     - filter_less: 0                       # Remove clients w/ less than 21 samples
     - num_loaders: 2
     - local_steps: 5
-    - learning_rate: 0.01
+    - learning_rate: 0.005
     - batch_size: 10
     - test_bsz: 32
     - use_cuda: False
