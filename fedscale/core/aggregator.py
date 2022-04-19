@@ -348,12 +348,12 @@ class Aggregator(object):
                 logging.warning(f"Fail to predict, this may be due to bad value in test_log:\n {self.test_log}")
             if pdt < 0.8 and pdt > 0:
                 logging.info(f"predicted accuracy in epoch {self.args.epochs}: {pdt}")
-                if self.opt_times < 3:
+                if self.opt_times < 1:
                     self.test_log = []
                     self.model = optimize(self.model, self.opt_times)
                     self.opt_model = self.model
                     self.opt_times += 1
-            elif len(self.test_log) > 100 and self.opt_times < 3:
+            elif len(self.test_log) > 50 and self.opt_times < 1:
                 self.test_log = []
                 self.model = optimize(self.model, self.opt_times)
                 self.opt_model = self.model
