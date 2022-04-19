@@ -91,21 +91,8 @@ class DataPartitioner(object):
 
     def partition_data_helper(self, num_clients, iid: bool=True, balanced: bool = False, num_part_label: int = -1):
         # partition data according to modes
-        if self.isTest is True:
-            logging.info(f"Random partition for testing")
-            self.uniform_partition(num_clients=num_clients)
-            return
-        if self.args.iid is True:
-            logging.info(f"IID partition data")
-            self.uniform_partition(num_clients=num_clients)
-        elif self.args.balanced is False:
-            logging.info(f"NON-IID partition data: each clients has unbalanced data of all classes ")
-            self.unbalanced_whole_label_partition()(num_clients)
-        elif num_part_label != -1:
-            logging.info(f"NON-IID partition data: each clients has balanced data of {num_part_label} classes")
-            self.balanced_skew_label_partition(num_clients, num_part_label)
-        else:
-            self.uniform_partition(num_clients)
+        logging.info(f"IID partition data")
+        self.uniform_partition(num_clients=num_clients)
 
     def uniform_partition(self, num_clients):
         # random partition
