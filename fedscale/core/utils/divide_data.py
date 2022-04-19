@@ -91,6 +91,9 @@ class DataPartitioner(object):
 
     def partition_data_helper(self, num_clients, iid: bool=True, balanced: bool = False, num_part_label: int = -1):
         # partition data according to modes
+        if self.isTest:
+            logging.info(f"Random Partition for testing")
+            self.uniform_partition(num_clients=num_clients)
         if iid is True:
             logging.info(f"IID partition data")
             self.uniform_partition(num_clients=num_clients)
