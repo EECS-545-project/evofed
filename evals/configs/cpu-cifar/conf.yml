@@ -9,7 +9,10 @@ ps_ip: 10.0.0.1
 # E.g., master node has 4 available processes, then 1 for the ps, and worker should be set to: worker:3
 worker_ips: 
     - 10.0.0.1:[2] # worker_ip: [(# processes on gpu) for gpu in available_gpus] eg. 10.0.0.2:[4,4,4,4] This node has 4 gpus, each gpu has 4 processes. 
-
+    - 10.0.0.2:[2]
+    - 10.0.0.3:[2]
+    - 10.0.0.4:[2]
+    - 10.0.0.5:[2]
 exp_path: $HOME/FedScale/fedscale/core
 
 # Entry function of executor and aggregator under $exp_path
@@ -31,16 +34,19 @@ setup_commands:
 job_conf: 
     - job_name: cifar                   # Generate logs under this folder: log_path/job_name/time_stamp
     - log_path: $HOME/FedScale/fedscale/logs # Path of log files
-    - total_worker: 4                      # Number of participants per round, we use K=100 in our paper, large K will be much slower
+    - total_worker: 100                      # Number of participants per round, we use K=100 in our paper, large K will be much slower
     - data_set: cifar10                     # Dataset: openImg, google_speech, stackoverflow
     - data_dir: $HOME/FedScale/dataset/data/    # Path of the dataset
-    - model: shufflenet_v2_x2_0                            # Models: e.g., shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2# - gradient_policy: yogi                 # {"fed-yogi", "fed-prox", "fed-avg"}, "fed-avg" by default
+    - model: resnet18                            # Models: e.g., shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2# - gradient_policy: yogi                 # {"fed-yogi", "fed-prox", "fed-avg"}, "fed-avg" by default
     - eval_interval: 5                     # How many rounds to run a testing on the testing set
     - epochs: 200                          # Number of rounds to run this training. We use 1000 in our paper, while it may converge w/ ~400 rounds
     - filter_less: 0                       # Remove clients w/ less than 21 samples
     - num_loaders: 2
-    - local_steps: 20
+    - local_steps: 5
     - learning_rate: 0.001
-    - batch_size: 32
+    - batch_size: 10
     - test_bsz: 32
     - use_cuda: False
+    - use_cuda: False
+    - iid: False
+    - balanced: True

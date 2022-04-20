@@ -130,7 +130,7 @@ class Executor(job_api_pb2_grpc.JobServiceServicer):
 
     def run(self):
         self.setup_env()
-        self.model = OptResnet18()
+        self.model = self.init_model()
         self.model = self.model.to(device=self.device)
         self.training_sets, self.testing_sets = self.init_data()
         self.setup_communication()

@@ -218,7 +218,7 @@ class Aggregator(object):
 
     def run(self):
         self.setup_env()
-        self.model = OptResnet18()
+        self.model = self.init_model()
         self.save_last_param()
 
         self.model_update_size = sys.getsizeof(pickle.dumps(self.model))/1024.0*8. # kbits
