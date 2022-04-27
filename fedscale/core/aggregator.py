@@ -282,20 +282,12 @@ class Aggregator(object):
         self.last_global_model = [param.data.clone() for param in self.model.parameters()]
 
 
-    def round_weight_handler(self, last_model, current_model):
-        if self.epoch > 1:
-            self.optimizer.update_round_gradient(last_model, current_model, self.model)
-
-
     def round_completion_handler(self):
         self.global_virtual_clock += self.round_duration
         self.epoch += 1
 
         if self.epoch % self.args.decay_epoch == 0:
             self.args.learning_rate = max(self.args.learning_rate*self.args.decay_factor, self.args.min_learning_rate)
-
-        # handle the global update w/ current and last
-        self.round_weight_handler(self.last_global_model, [param.data.clone() for param in self.model.parameters()])
 
         avgUtilLastEpoch = sum(self.stats_util_accumulator)/max(1, len(self.stats_util_accumulator))
         # assign avg reward to explored, but not ran workers
@@ -340,7 +332,7 @@ class Aggregator(object):
         self.client_training_results = []
 
         logging.info(f"{self.test_log}")
-        if len(self.test_log) > 300:
+        if len(self.test_log) > 50:
             pdt = -1.0
             try:
                 pdt = predict(self.test_log, self.args.epochs - self.epoch)
@@ -353,7 +345,7 @@ class Aggregator(object):
                     self.model = optimize(self.model, self.opt_times)
                     self.opt_model = self.model
                     self.opt_times += 1
-            elif len(self.test_log) > 300 and self.opt_times < 1:
+            elif len(self.test_log) > 100 and self.opt_times < 1:
                 self.test_log = []
                 self.model = optimize(self.model, self.opt_times)
                 self.opt_model = self.model

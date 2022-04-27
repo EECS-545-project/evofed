@@ -16,14 +16,6 @@ class clientManager(object):
 
         self.ucbSampler = None 
 
-        if self.mode == 'oort': 
-            import sys,os
-            current = os.path.dirname(os.path.realpath(__file__))
-            parent = os.path.dirname(current)
-            sys.path.append(parent)
-            from thirdparty.oort.oort import create_training_selector
-            #sys.path.append(current) 
-            self.ucbSampler =  create_training_selector(args=args)
         self.feasibleClients = []
         self.rng = Random()
         self.rng.seed(sample_seed)
@@ -184,12 +176,9 @@ class clientManager(object):
         pickled_clients = None
         clients_online_set = set(clients_online)
 
-        if self.mode == "oort" and self.count > 1:
-            pickled_clients = self.ucbSampler.select_participant(numOfClients, feasible_clients=clients_online_set)
-        else:
-            self.rng.shuffle(clients_online)
-            client_len = min(numOfClients, len(clients_online) -1)
-            pickled_clients = clients_online[:client_len]
+        self.rng.shuffle(clients_online)
+        client_len = min(numOfClients, len(clients_online) -1)
+        pickled_clients = clients_online[:client_len]
 
         return pickled_clients
 

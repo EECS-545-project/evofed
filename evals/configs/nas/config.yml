@@ -50,3 +50,4 @@ job_conf:
     - use_cuda: False
     - iid: False
     - balanced: True
+    - use_epoch: True

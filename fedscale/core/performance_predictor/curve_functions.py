@@ -1,6 +1,9 @@
 import numpy as np
 
-
+"""
+this 10 functions are selected and copied from
+https://github.com/automl/pylearningcurvepredictor/blob/master/pylrpredictor/curvefunctions.py
+"""
 
 def pow3(x, c, a, alpha):
     return c - a * x**(-alpha)
